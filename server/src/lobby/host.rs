@@ -2,8 +2,8 @@
 //! row-table helpers they alone use (replace by key, the per-address count, the eviction).
 
 use super::{
-    as_bool, as_int, as_str, build_claim_from_body, clamp_field, drop_lobby, host_listed, rate_ok, Lobby,
-    MasterState, MAX_GAME, MAX_GAME_BUILD, MAX_LOBBIES_GLOBAL, MAX_LOBBIES_PER_IP, MAX_NAME, MAX_VERSION,
+    as_bool, as_int, as_str, build_claim_from_body, clamp_field, drop_lobby, host_listed, host_players_max, rate_ok,
+    Lobby, MasterState, MAX_GAME, MAX_GAME_BUILD, MAX_LOBBIES_GLOBAL, MAX_LOBBIES_PER_IP, MAX_NAME, MAX_VERSION,
     MAX_WORLD, RL_CHALLENGE, RL_CREATE,
 };
 use crate::common::{identity_shape_ok, ip_bucket, log};
@@ -127,7 +127,7 @@ pub fn h_host(state: &mut MasterState, ctx: &HostCtx, ip: &str, body: &Value) ->
     }
     lo.world = clamp_field(body, "world", MAX_WORLD);
     lo.locked = as_bool(body, "locked", false);
-    lo.players_max = as_int(body, "players_max", 4).clamp(1, 4);
+    lo.players_max = host_players_max(body);
     (lo.build_sha, lo.build_key, lo.build_sig) = build_claim_from_body(body);
     lo.listed = host_listed(body);
 

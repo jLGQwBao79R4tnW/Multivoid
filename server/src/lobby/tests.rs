@@ -4,8 +4,8 @@ mod proof;
 
 use super::host::{h_challenge, h_host, HostCtx};
 use super::{
-    build_claim_from_body, h_browse, host_listed, latest_answer, parse_latest_games, rate_ok, LatestGame, Lobby,
-    LobbyLinks, MasterState, LATEST_URL, MAX_LOBBIES_GLOBAL, MAX_RATE_KEYS, RL_BROWSE,
+    build_claim_from_body, h_browse, host_listed, host_players_max, latest_answer, parse_latest_games, rate_ok, LatestGame, Lobby,
+    LobbyLinks, MasterState, LATEST_URL, MAX_LOBBIES_GLOBAL, MAX_PLAYERS, MAX_RATE_KEYS, RL_BROWSE,
 };
 use crate::common::{build_claim_shape_ok, identity_shape_ok};
 use crate::lobby_proof::{MAX_SPENT, SPENT_ENTRY_BYTES};
@@ -128,6 +128,16 @@ fn a_host_body_lists_unless_it_says_not() {
     assert!(!host_listed(&serde_json::json!({"listed": false})));
     assert!(host_listed(&serde_json::json!({"listed": true})));
     assert!(host_listed(&serde_json::json!({})));
+}
+
+#[test]
+fn a_host_body_names_up_to_sixteen_players() {
+    assert_eq!(MAX_PLAYERS, 16);
+    assert_eq!(host_players_max(&serde_json::json!({"players_max": 16})), 16);
+    assert_eq!(host_players_max(&serde_json::json!({"players_max": 9})), 9);
+    assert_eq!(host_players_max(&serde_json::json!({"players_max": 17})), 16);
+    assert_eq!(host_players_max(&serde_json::json!({"players_max": 0})), 1);
+    assert_eq!(host_players_max(&serde_json::json!({})), 16);
 }
 
 #[test]

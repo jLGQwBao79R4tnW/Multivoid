@@ -42,6 +42,8 @@ pub const RL_MUTATE: (Duration, usize) = (Duration::from_secs(60), 240);
 // An open browser fetches every 5 s (12 a minute), so 120 leaves room for ten players behind one address.
 pub const RL_BROWSE: (Duration, usize) = (Duration::from_secs(60), 120);
 
+/// The most players a lobby holds, its host included: the mod's `kMaxPeers` (coop/player/players_registry.h).
+pub const MAX_PLAYERS: i64 = 16;
 pub const MAX_NAME: usize = 63;
 pub const MAX_WORLD: usize = 39;
 pub const MAX_VERSION: usize = 23;
@@ -237,7 +239,7 @@ impl Lobby {
             world: String::new(),
             locked: false,
             players_cur: 0,
-            players_max: 4,
+            players_max: MAX_PLAYERS,
             listed: true,
             build_sha: String::new(),
             build_key: 0,
@@ -347,6 +349,11 @@ pub fn build_claim_from_body(body: &Value) -> (String, u8, String) {
 /// Whether a `/v1/host` body lists the lobby: its `listed`, true when it sends none.
 pub fn host_listed(body: &Value) -> bool {
     as_bool(body, "listed", true)
+}
+
+/// How many players a `/v1/host` body says its lobby holds, in 1..=MAX_PLAYERS; MAX_PLAYERS when it sends none.
+pub fn host_players_max(body: &Value) -> i64 {
+    as_int(body, "players_max", MAX_PLAYERS).clamp(1, MAX_PLAYERS)
 }
 
 // ---- helpers ----------------------------------------------------------------
