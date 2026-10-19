@@ -27,10 +27,17 @@ namespace coop::element { class Player; }
 namespace coop::players {
 
 // Peer session ids: the host is 0, clients count up from 1. Each peer has one local and up to
-// the maximum minus one puppets; the maximum covers a host and three clients.
-inline constexpr uint8_t kMaxPeers       = 4;
+// the maximum minus one puppets; the maximum covers a host and fifteen clients.
+inline constexpr uint8_t kMaxPeers       = 16;
 inline constexpr uint8_t kPeerIdHost     = 0;
 inline constexpr uint8_t kPeerIdUnknown  = 0xFF;  // not in registry
+
+// A set of peer slots, one bit a slot: slot s is bit (1 << s). PeerBit is empty past the cap.
+using PeerMask = uint16_t;
+static_assert(sizeof(PeerMask) * 8 >= kMaxPeers, "a PeerMask holds one bit for every slot");
+constexpr PeerMask PeerBit(int slot) {
+    return slot >= 0 && slot < kMaxPeers ? static_cast<PeerMask>(1u << slot) : PeerMask{0};
+}
 
 class Registry {
 public:

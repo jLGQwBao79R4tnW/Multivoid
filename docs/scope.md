@@ -49,4 +49,6 @@ the commit that ships the change.
 5. **Every lane answers the late join.** A peer that joins mid-event, mid-download or mid-drive
    sees the current state; a lane is not done until that answer exists.
 6. **Per-peer things stay per-peer.** Own vitals, own inventory, own view.
-7. **Four players, about a hundred active entities** is the scale everything is sized for.
+7. **Sixteen players, about a hundred active entities** is the scale everything is sized for. The
+   host relays every client's streams to every other client, so its upload grows with the square of
+   the player count; the rig stages four.

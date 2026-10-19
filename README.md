@@ -22,7 +22,7 @@
 
 ## What works today
 
-- **LAN and Internet sessions** — one host, up to three clients; direct IP or the built-in
+- **LAN and Internet sessions** — one host, up to fifteen clients; direct IP or the built-in
   **server browser** backed by the official master server (NAT traversal via signaling + TURN).
   Lobbies advertise `game + build`; a mismatched peer is refused before joining, and old cohorts
   keep playing together — updates are never forced.

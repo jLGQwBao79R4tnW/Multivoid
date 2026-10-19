@@ -280,8 +280,9 @@ void Tick() {
     }
 
     // Inbound: the session voice inbox into the jitter buffers. One batch drain is one lock per
-    // tick, and the buffer is sized so every ring can be full.
-    coop::net::Session::VoiceFrameMsg
+    // tick, and the buffer is sized so every ring can be full: some 50 KB at sixteen slots, so it is
+    // static (this tick runs on the game thread alone) rather than on the game thread's stack.
+    static coop::net::Session::VoiceFrameMsg
         inbox[coop::net::kMaxPeers * coop::net::Session::kVoiceRingPerSlot];
     const int got = s->DrainVoiceFrames(inbox, static_cast<int>(coop::net::kMaxPeers) *
                                                    coop::net::Session::kVoiceRingPerSlot);

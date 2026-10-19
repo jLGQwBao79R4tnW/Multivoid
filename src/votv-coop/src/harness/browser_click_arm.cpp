@@ -5,6 +5,7 @@
 
 #include "ui/server_browser_surface.h"  // which browser this session uses
 #include "coop/net/master_slots.h"
+#include "coop/player/players_registry.h"
 #include "coop/session/session_manager.h"
 #include "ue_wrap/core/log.h"
 
@@ -32,7 +33,7 @@ void FireFromEnv() {
     // POST /v1/host to the chosen master, then a P2P host session in whatever world is loaded.
     char hlEnv[8] = {};
     if (::GetEnvironmentVariableA("VOTVCOOP_TEST_HOST_LOBBY", hlEnv, sizeof(hlEnv)) > 0 && hlEnv[0] == '1') {
-        coop::session_manager::HostLobby("Test Host", std::string(), /*locked=*/false, /*playersMax=*/4);
+        coop::session_manager::HostLobby("Test Host", std::string(), /*locked=*/false, coop::players::kMaxPeers);
         UE_LOGI("harness: VOTVCOOP_TEST_HOST_LOBBY=1 -- fired the test-only HostLobby announce (test)");
     }
     // POST /v1/join to the chosen master, then a P2P client session. The lobby id doubles as the display
@@ -49,7 +50,7 @@ void FireFromEnv() {
         coop::session_manager::SaveChoice c;
         c.newGame = false;
         c.slot = hsEnv;
-        coop::session_manager::HostWithSave(c, "Test Host", /*locked=*/false, /*password=*/"", /*playersMax=*/4,
+        coop::session_manager::HostWithSave(c, "Test Host", /*locked=*/false, /*password=*/"", coop::players::kMaxPeers,
             coop::net::master_slots::Selected().url);
         UE_LOGI("harness: VOTVCOOP_TEST_HOST_SAVE=%s -- fired a picker HOST-WITH-SAVE (load existing, test)", hsEnv);
     }
@@ -59,7 +60,7 @@ void FireFromEnv() {
         c.newGame = true;
         c.newName = hnEnv;
         c.mode = 0;  // story
-        coop::session_manager::HostWithSave(c, "Test Host", /*locked=*/false, /*password=*/"", /*playersMax=*/4,
+        coop::session_manager::HostWithSave(c, "Test Host", /*locked=*/false, /*password=*/"", coop::players::kMaxPeers,
             coop::net::master_slots::Selected().url);
         UE_LOGI("harness: VOTVCOOP_TEST_HOST_NEW=%s -- fired a picker HOST-WITH-SAVE (new story game, test)", hnEnv);
     }

@@ -13,6 +13,7 @@
 #include "coop/net/lobby_announcer.h"
 #include "coop/net/master_slots.h"  // which master a new lobby, the list and the update check use
 #include "coop/net/protocol.h"  // kProtocolVersion (the b<N> build rev), kDefaultPort
+#include "coop/player/players_registry.h"  // kMaxPeers: the lobby's announced size
 #include "coop/session/join_progress.h"
 #include "coop/session/shutdown.h"
 #include "coop/version.h"  // kGameTarget -- the game half of the Paper-pair identity (CMake-generated)
@@ -59,7 +60,7 @@ struct DeferredAnnounce {
     std::string name;
     std::string world;
     bool locked = false;
-    int playersMax = 4;
+    int playersMax = coop::players::kMaxPeers;
     int directPort = 0;
 };
 std::mutex g_deferredMu;
@@ -392,7 +393,7 @@ void AnnounceEnvHostHidden(const std::string& name, const std::string& world) {
             if (coop::shutdown::IsShuttingDown()) { g_actionBusy.store(false); return; }
             const lobby::HostInfo info =
                 Announcer().Host(masterUrl, name, world,
-                                 /*locked=*/false, /*playersMax=*/4, 8000);
+                                 /*locked=*/false, coop::players::kMaxPeers, 8000);
             if (info.ok) {
                 Announcer().SetListed(false); // the hide-from-list flag, immediately
                 // Seed the UI mirror too, or the scoreboard's "Show in server browser" tick reads

@@ -9,6 +9,7 @@
 #include "coop/net/protocol.h"   // kDefaultPort -- was reaching it only transitively
 #include "coop/session/host_mode.h"
 #include "coop/net/master_slots.h"  // the chosen master, where the lobby is announced
+#include "coop/player/players_registry.h"  // kMaxPeers: the lobby's announced size
 #include "coop/session/session_manager.h"
 #include "ui/scale.h"
 #include "ue_wrap/core/log.h"
@@ -50,7 +51,7 @@ std::wstring g_conflictSlot;
 // Lobby host params captured from the server browser on Open().
 std::string g_hostName = "My VOTV Server";
 bool g_hostLocked = false;
-int  g_hostMax = 4;
+int  g_hostMax = coop::players::kMaxPeers;
 // Connection selector: 0 = AUTOMATIC (P2P/ICE -- direct when the NAT allows it,
 // relay automatically otherwise; nothing to configure), 1 = DIRECT (LanDirect UDP
 // listen; needs the port forwarded, and friends join through Direct Connect or the
@@ -145,7 +146,7 @@ void DoHostNew() {
 void Open(const std::string& hostName, bool locked, int playersMax) {
     g_hostName = hostName.empty() ? std::string("My VOTV Server") : hostName;
     g_hostLocked = locked;
-    g_hostMax = playersMax > 0 ? playersMax : 4;
+    g_hostMax = playersMax > 0 ? playersMax : coop::players::kMaxPeers;
     g_selected = -1;
     g_conflictSlot.clear();
     // RESOLVED ON OPEN, NEVER IN Render(). `ResolveInt` reaches `ReadIniValue`, which

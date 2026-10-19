@@ -605,7 +605,7 @@ void Session::HandleConnStatusChanged(void* info) {
         // peer, and FindFreePeerSlotForClient hands the slot out only after it. It runs only for
         // the path that claimed the slot: a racing kick's teardown owns the clear otherwise, and a
         // second one would wipe a successor seated in between.
-        // A client's slots 1..3 are the other players as the host relayed them, and they end with
+        // A client's other slots are the other players as the host relayed them, and they end with
         // the link: the host link's close resets every slot and empties the whole inbox.
         if (owned && cfg_.role == Role::Client && slot == 0) {
             { std::lock_guard<std::mutex> lk(remoteMutex_);

@@ -39,8 +39,8 @@ std::vector<ue_wrap::CachedObjRef> g_tied;
 std::vector<ue_wrap::CachedObjRef> g_next;
 // Beside each entry of g_tied and g_next, in step with it: the PLAYER slots whose hook pulls that prop, as a bit mask
 // (bit 0 the host). An anchored hook and a level hook are a tether, no player's hold, and set nothing.
-std::vector<uint8_t> g_tiedHolders;
-std::vector<uint8_t> g_nextHolders;
+std::vector<coop::players::PeerMask> g_tiedHolders;
+std::vector<coop::players::PeerMask> g_nextHolders;
 
 const ue_wrap::CachedObjRef* Known(void* p) {
     for (const auto& r : g_tied)
@@ -57,7 +57,7 @@ int NextIndex(void* p) {
 
 bool InNext(void* p) { return NextIndex(p) >= 0; }
 
-void PushNext(const ue_wrap::CachedObjRef& r, uint8_t holders) {
+void PushNext(const ue_wrap::CachedObjRef& r, coop::players::PeerMask holders) {
     g_next.push_back(r);
     g_nextHolders.push_back(holders);
 }
@@ -98,7 +98,7 @@ size_t HubPassComplete(void*, bool isFull, uint32_t worldGen) {
 
 // The keyed props `hook` is tied to, appended to g_next without duplicates. `holders` is the player-slot bit
 // the hook stands for (0 for a tether); a prop another hook already collected takes the bit into its mask.
-void CollectTied(void* hook, uint8_t holders) {
+void CollectTied(void* hook, coop::players::PeerMask holders) {
     void* a = nullptr;
     void* b = nullptr;
     if (!H::AttachedActors(hook, a, b)) return;
@@ -119,23 +119,19 @@ void CollectTied(void* hook, uint8_t holders) {
     }
 }
 
-// The mask bit of a client's own hook: its owner's slot, from the mirror's key.
-uint8_t PlayerBit(uint8_t slot) {
-    return slot < coop::players::kMaxPeers ? static_cast<uint8_t>(1u << slot) : uint8_t{0};
-}
-
 }  // namespace
 
 void TickPropClaims() {
     g_next.clear();
     g_nextHolders.clear();
     for (const Owned& o : OwnedHooks())
-        if (void* h = o.ref.Get()) CollectTied(h, PlayerBit(0));
+        if (void* h = o.ref.Get()) CollectTied(h, coop::players::PeerBit(0));
     for (const Adopted& a : AdoptedHooks())
         if (void* h = a.ref.Get()) CollectTied(h, 0);
     for (const auto& kv : Mirrors())
         if (kv.second.bitten)
-            if (void* h = kv.second.ref.Get()) CollectTied(h, kv.second.anchored ? uint8_t{0} : PlayerBit(SlotOf(kv.first)));
+            if (void* h = kv.second.ref.Get())
+                CollectTied(h, kv.second.anchored ? coop::players::PeerMask{0} : coop::players::PeerBit(SlotOf(kv.first)));
     if (g_worldGen == ue_wrap::world_identity::Generation())
         for (const WorldHook& w : g_world)
             if (R::IsLiveByIndex(w.actor, w.idx)) CollectTied(w.actor, 0);
@@ -173,7 +169,7 @@ void RegisterWorldHooksScan() {
 
 namespace coop::hook_sync {
 
-uint8_t PlayerHookHolders(void* actor) {
+coop::players::PeerMask PlayerHookHolders(void* actor) {
     UE_ASSERT_GAME_THREAD("hook_sync::PlayerHookHolders");
     if (!actor) return 0;
     for (size_t i = 0; i < detail::g_tied.size(); ++i)

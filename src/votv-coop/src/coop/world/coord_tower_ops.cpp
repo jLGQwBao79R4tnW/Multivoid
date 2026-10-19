@@ -29,6 +29,7 @@
 #include <chrono>
 #include <cstdint>
 #include <deque>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -41,7 +42,9 @@ namespace R  = ue_wrap::reflection;
 namespace sg = ue_wrap::script_gate;
 using coop::net::CoordTowerPayload;
 
-static_assert(coop::net::kMaxPeers <= 4, "CoordTowerPayload's acknowledgements hold four slots");
+static_assert(std::size(coop::net::CoordTowerPayload{}.ack) >= coop::net::kMaxPeers &&
+                  std::size(coop::net::CoordTowerPayload{}.refused) >= coop::net::kMaxPeers,
+              "CoordTowerPayload's acknowledgements hold every slot");
 
 // A slot's ops wait, in arrival order, while the towers have not resolved, their sender has no body here yet (a
 // joiner's first pose follows its world-ready by seconds) or an insert's spend has not arrived (its destroy rides

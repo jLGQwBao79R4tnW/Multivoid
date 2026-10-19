@@ -33,7 +33,7 @@ namespace coop::text {
 // the text ENTERS, every surface that later draws the string is bounded by construction.
 //
 // WIRED AT CHAT ONLY, a measurement rather than an oversight. The other remote text field is
-// the nickname, bounded by CONSTRUCTION: kNickMaxChars codepoints x kMaxPeers is at most 80
+// the nickname, bounded by CONSTRUCTION: kNickMaxChars codepoints x kMaxPeers is at most 320
 // codepoints for the whole lobby, ever, and a field that cannot exceed a small constant is not
 // an amplification vector. Chat is unbounded in count and attacker-chosen in content.
 bool AdmitRemoteText(uint8_t peerSlot, const std::wstring& text);

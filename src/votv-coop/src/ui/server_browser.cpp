@@ -13,6 +13,7 @@
 #include "ui/host_save_picker.h"
 #include "ui/menu_sfx.h"        // native VOTV button click + rollover sounds
 #include "coop/net/protocol.h"  // kProtocolVersion (the "Ver" mismatch tint)
+#include "coop/player/players_registry.h"  // kMaxPeers: the lobby's announced size
 #include "coop/game_build/game_build.h"
 #include "coop/session/session_manager.h"
 #include "coop/config/config.h"   // local-only ini persistence for the name + last direct address
@@ -156,7 +157,7 @@ void Render() {
             // Open the save picker (native loadSlots list + New Game); on confirm it
             // calls HostWithSave -> the harness loads the chosen world then hosts. (The
             // old immediate HostLobby-on-the-current-world path is gone, RULE 2.)
-            ui::host_save_picker::Open(g_hostName, g_hostLocked, /*playersMax=*/4);
+            ui::host_save_picker::Open(g_hostName, g_hostLocked, coop::players::kMaxPeers);
         }
         ImGui::SameLine(0.0f, S(24.0f));
         if (ui::menu_sfx::Button("Refresh")) sm::Refresh();

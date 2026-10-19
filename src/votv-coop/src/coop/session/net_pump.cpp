@@ -446,7 +446,7 @@ void Tick(coop::net::Session& session) {
         // tick) has no edge, so the successor would inherit. The row transition compares values and
         // sees both.
         if (!g_wasConnectedBySlot[slot] && slotConnected) {
-            // Host side (slots 1..3): the replay fires on the joiner's ClientWorldReady, not here;
+            // Host side (slots 1 and up): the replay fires on the joiner's ClientWorldReady, not here;
             // a menu-mode joiner is connected 30-60 s before it has a world. Client side (slot 0):
             // announce the flashlight, request the save transfer, open our world-ready send gate
             // (subsystems::ClientConnectEdge).
